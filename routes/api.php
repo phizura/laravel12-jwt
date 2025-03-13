@@ -12,6 +12,7 @@ Route::prefix('/auth')->middleware(['throttle:limiter'])->controller(AuthControl
     Route::post('/register', 'register');
     Route::post('/login', 'login');
 
+    Route::post('/refresh', 'refresh')->middleware(['auth.refresh']);
     Route::middleware(['auth.token'])->group(function () {
         Route::get('/me', 'me');
         Route::post('/logout', 'logout');

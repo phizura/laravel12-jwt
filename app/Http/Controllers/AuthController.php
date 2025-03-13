@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Traits\HandleExceptions;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
 
 class AuthController extends Controller
 {
@@ -57,6 +58,16 @@ class AuthController extends Controller
         } catch (\Exception $e) {
             $error = $this->handleException($e);
             return response()->json(new ApiResource(null, $error['status'], $error['message']), $error['status']);
+        }
+    }
+
+    public function refresh()
+    {
+        try {
+            $token = JWTAuth::parseToken()->refresh();
+            return response()->json(new ApiResource($token, 200, 'Login success'));
+        } catch (\Exception $e) {
+            return response()->json(new ApiResource(null, 401, 'Token expired and cannot be refreshed anymore'), 401);
         }
     }
 }

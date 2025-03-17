@@ -6,16 +6,10 @@ use App\Http\Resources\ApiResource;
 use App\Traits\HandleExceptions;
 use Closure;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use PHPOpenSourceSaver\JWTAuth\Exceptions\JWTException;
-use PHPOpenSourceSaver\JWTAuth\Exceptions\TokenExpiredException;
-use PHPOpenSourceSaver\JWTAuth\Exceptions\TokenInvalidException;
-use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
 use Symfony\Component\HttpFoundation\Response;
 
-class Authenticate
+class AuthTokenOnly
 {
-
     use HandleExceptions;
     /**
      * Handle an incoming request.
@@ -35,10 +29,6 @@ class Authenticate
 
             if ($prefix !== 'Bearer' && !$token) {
                 return response()->json(new ApiResource(null, 401, 'Unauthorized'), 401);
-            }
-
-            if (!$user = JWTAuth::parseToken()->authenticate()) {
-                return response()->json(new ApiResource(null, 401, 'User not found or token invalid'), 401);
             }
         } catch (\Exception $e) {
             $error = $this->handleException($e);

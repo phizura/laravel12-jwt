@@ -8,6 +8,9 @@ use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\QueryException;
+use PHPOpenSourceSaver\JWTAuth\Exceptions\JWTException;
+use PHPOpenSourceSaver\JWTAuth\Exceptions\TokenExpiredException;
+use PHPOpenSourceSaver\JWTAuth\Exceptions\TokenInvalidException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 trait HandleExceptions
@@ -88,6 +91,27 @@ trait HandleExceptions
             return [
                 'message' => 'Undefined method called.',
                 'status' => 400
+            ];
+        }
+
+        if ($exception instanceof TokenExpiredException) {
+            return [
+                'message' => 'Token has expired',
+                'status' => 401,
+            ];
+        }
+
+        if ($exception instanceof TokenInvalidException) {
+            return [
+                'message' => 'Token is invalid',
+                'status' => 401,
+            ];
+        }
+
+        if ($exception instanceof JWTException) {
+            return [
+                'message' => 'Token not provided',
+                'status' => 401,
             ];
         }
 

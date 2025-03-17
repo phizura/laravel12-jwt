@@ -41,19 +41,23 @@ class AuthController extends Controller
             return response()->json(new ApiResource(null, 401, 'Unauthorized'), 401);
         }
 
-        return response()->json(new ApiResource($token, 200, 'Login success'));
+        $cookie = cookie('accessToken', $token, 45, '/', 'localhost', false, true);
+        return response()->json(new ApiResource($token, 200, 'Login success'))
+            ->cookie($cookie);
     }
 
     public function logout()
     {
-        Auth::logout();
-        return response()->json(new ApiResource(null, 200, 'Logout success'));
+        $cookie = cookie()->forget('accessToken');
+        return response()
+            ->json(new ApiResource(null, 200, 'Logout success'))
+            ->withCookie($cookie);
     }
 
-    public function me(Request $request)
+    public function me()
     {
         try {
-            $user = $request->input('user');
+            $user = Auth::user();
             return response()->json(new ApiResource($user, 200, 'Success get user profile'));
         } catch (\Exception $e) {
             $error = $this->handleException($e);
@@ -64,10 +68,13 @@ class AuthController extends Controller
     public function refresh()
     {
         try {
-            $token = JWTAuth::parseToken()->refresh();
-            return response()->json(new ApiResource($token, 200, 'Login success'));
+            $newToken = Auth::refresh();
+
+            $cookie = cookie('accessToken', $newToken, 45, '/', 'localhost', false, true);
+            return response()->json(new ApiResource($newToken, 200, 'Successful generate new token'))
+                ->cookie($cookie);
         } catch (\Exception $e) {
-            return response()->json(new ApiResource(null, 401, 'Token expired and cannot be refreshed anymore'), 401);
+            return response()->json(new ApiResource(null, 401, 'Token invalid or expired'), 401);
         }
     }
 }

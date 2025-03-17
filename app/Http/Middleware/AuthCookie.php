@@ -2,12 +2,11 @@
 
 namespace App\Http\Middleware;
 
-use App\Http\Resources\ApiResource;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class AuthRefresh
+class AuthCookie
 {
     /**
      * Handle an incoming request.
@@ -16,9 +15,8 @@ class AuthRefresh
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $token  = $request->bearerToken();
-        if (!$token) {
-            return response()->json(new ApiResource(null, 401, 'Unauthorized'), 401);
+        if ($token = $request->cookie('accessToken')) {
+            $request->headers->set('Authorization', 'Bearer ' . $token);
         }
         return $next($request);
     }

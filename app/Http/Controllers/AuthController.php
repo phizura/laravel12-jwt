@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\CookieHelper;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\RegisterRequest;
 use App\Http\Resources\ApiResource;
 use App\Models\User;
 use App\Traits\HandleExceptions;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
 
@@ -41,7 +41,7 @@ class AuthController extends Controller
             return response()->json(new ApiResource(null, 401, 'Unauthorized'), 401);
         }
 
-        $cookie = cookie('accessToken', $token, 45, '/', 'localhost', false, true);
+        $cookie = CookieHelper::makeCookie('accessToken', $token) ;
         return response()->json(new ApiResource($token, 200, 'Login success'))
             ->cookie($cookie);
     }
@@ -49,6 +49,8 @@ class AuthController extends Controller
     public function logout()
     {
         $cookie = cookie()->forget('accessToken');
+        JWTAuth::invalidate(JWTAuth::getToken());
+
         return response()
             ->json(new ApiResource(null, 200, 'Logout success'))
             ->withCookie($cookie);
@@ -68,9 +70,10 @@ class AuthController extends Controller
     public function refresh()
     {
         try {
-            $newToken = Auth::refresh();
+            $newToken = JWTAuth::refresh();
+            JWTAuth::invalidate(JWTAuth::getToken());
 
-            $cookie = cookie('accessToken', $newToken, 45, '/', 'localhost', false, true);
+            $cookie = CookieHelper::makeCookie('accessToken', $newToken);
             return response()->json(new ApiResource($newToken, 200, 'Successful generate new token'))
                 ->cookie($cookie);
         } catch (\Exception $e) {

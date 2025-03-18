@@ -41,7 +41,7 @@ class AuthController extends Controller
             return response()->json(new ApiResource(null, 401, 'Unauthorized'), 401);
         }
 
-        $cookie = CookieHelper::makeCookie('accessToken', $token) ;
+        $cookie = CookieHelper::makeCookie('accessToken', $token);
         return response()->json(new ApiResource($token, 200, 'Login success'))
             ->cookie($cookie);
     }
@@ -70,8 +70,9 @@ class AuthController extends Controller
     public function refresh()
     {
         try {
-            $newToken = JWTAuth::refresh();
-            JWTAuth::invalidate(JWTAuth::getToken());
+            $oldToken = JWTAuth::getToken();
+            $newToken = JWTAuth::refresh($oldToken);
+            JWTAuth::invalidate($oldToken);
 
             $cookie = CookieHelper::makeCookie('accessToken', $newToken);
             return response()->json(new ApiResource($newToken, 200, 'Successful generate new token'))

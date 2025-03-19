@@ -21,14 +21,14 @@ class AuthTokenOnly
         $accessToken = $request->header('Authorization');
 
         if (!$accessToken) {
-            return response()->json(new ApiResource(null, 401, 'Unauthorized'), 401);
+            return response()->json(new ApiResource(null, 403, 'Unauthorized'), 403);
         }
 
         try {
             list($prefix, $token) = explode(' ', $accessToken);
 
             if ($prefix !== 'Bearer' && !$token) {
-                return response()->json(new ApiResource(null, 401, 'Unauthorized'), 401);
+                return response()->json(new ApiResource(null, 403, 'Unauthorized'), 403);
             }
         } catch (\Exception $e) {
             $error = $this->handleException($e);

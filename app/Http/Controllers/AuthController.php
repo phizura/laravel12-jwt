@@ -38,7 +38,7 @@ class AuthController extends Controller
 
         $token = Auth::attempt($credentials);
         if (!$token) {
-            return response()->json(new ApiResource(null, 401, 'Unauthorized'), 401);
+            return response()->json(new ApiResource(null, 401, 'Your credential is mismatched. Try again!'), 401);
         }
 
         $cookie = CookieHelper::makeCookie('accessToken', $token);
@@ -78,7 +78,7 @@ class AuthController extends Controller
             return response()->json(new ApiResource($newToken, 200, 'Successful generate new token'))
                 ->cookie($cookie);
         } catch (\Exception $e) {
-            return response()->json(new ApiResource(null, 401, 'Token invalid or expired'), 401);
+            return response()->json(new ApiResource(null, 403, 'Token invalid or expired'), 403);
         }
     }
 }

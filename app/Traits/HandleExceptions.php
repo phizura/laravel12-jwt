@@ -97,21 +97,21 @@ trait HandleExceptions
         if ($exception instanceof TokenExpiredException) {
             return [
                 'message' => 'Token has expired',
-                'status' => 401,
+                'status' => 403,
             ];
         }
 
         if ($exception instanceof TokenInvalidException) {
             return [
                 'message' => 'Token is invalid',
-                'status' => 401,
+                'status' => 403,
             ];
         }
 
         if ($exception instanceof JWTException) {
             return [
                 'message' => 'Token not provided',
-                'status' => 401,
+                'status' => 403,
             ];
         }
 

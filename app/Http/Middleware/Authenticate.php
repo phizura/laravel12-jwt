@@ -27,18 +27,18 @@ class Authenticate
         $accessToken = $request->header('Authorization');
 
         if (!$accessToken) {
-            return response()->json(new ApiResource(null, 401, 'Unauthorized'), 401);
+            return response()->json(new ApiResource(null, 403, 'Unauthorized'), 403);
         }
 
         try {
             list($prefix, $token) = explode(' ', $accessToken);
 
             if ($prefix !== 'Bearer' && !$token) {
-                return response()->json(new ApiResource(null, 401, 'Unauthorized'), 401);
+                return response()->json(new ApiResource(null, 403, 'Unauthorized'), 403);
             }
 
             if (!$user = JWTAuth::parseToken()->authenticate()) {
-                return response()->json(new ApiResource(null, 401, 'User not found or token invalid'), 401);
+                return response()->json(new ApiResource(null, 403, 'User not found or token invalid'), 403);
             }
         } catch (\Exception $e) {
             $error = $this->handleException($e);
